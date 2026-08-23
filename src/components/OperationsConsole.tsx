@@ -7,6 +7,7 @@ import type { FreightPlan } from "@/modules/operations/contracts";
 type DashboardPayload = { workspaces: Workspace[]; snapshot: DashboardSnapshot | null; livePlan: FreightPlan | null; error?: string };
 type IntakeReceipt = { order_id: string; tracking_number: string; state: string; created_at: string };
 type TrackingResult = { tracking_number: string; state: string; service_level: string; destination: { city?: string; country_code?: string }; events: Array<{ state: string; message: string; event_at: string; city?: string }> };
+type SultanRecommendation = { recommendation_id: string; action: string; recommended_provider_code: string | null; provider_reason: string; next_human_action: string; customs_ready: boolean; missing_information: string[]; pallet_estimate: { pallet_count: number; freight_mode: string; average_utilization_pct: number }; authority: Record<string, boolean> };
 
 const transitions: Record<string, string[]> = {
   ORDER_RECEIVED: ["AWAITING_SUPPLIER", "INBOUND_TO_ORIGIN_HUB", "EXCEPTION"],
@@ -39,6 +40,7 @@ export default function OperationsConsole() {
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState<IntakeReceipt | null>(null);
   const [tracking, setTracking] = useState<TrackingResult | null>(null);
+  const [sultan, setSultan] = useState<SultanRecommendation | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -100,6 +102,15 @@ export default function OperationsConsole() {
     finally { setBusy(false); }
   }
 
+  async function recommend(orderId: string) {
+    setBusy(true); setMessage(""); setSultan(null);
+    try {
+      const result = await jsonFetch<{ data: SultanRecommendation }>("/api/v1/operations/recommendations", { method: "POST", headers: { "content-type": "application/json", "idempotency-key": crypto.randomUUID() }, body: JSON.stringify({ order_id: orderId }) });
+      setSultan(result.data);
+    } catch (error) { setMessage(error instanceof Error ? error.message : "Sultan FEP recommendation failed"); }
+    finally { setBusy(false); }
+  }
+
   async function track(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setTracking(null); setMessage("");
     const number = String(new FormData(event.currentTarget).get("tracking_number") ?? "").trim();
@@ -129,7 +140,8 @@ export default function OperationsConsole() {
           <label>SKU<input name="sku" /></label><label className="wide">Item description<input required name="title" /></label><label>Quantity<input required min="1" name="quantity" type="number" defaultValue="1" /></label><label>HS code<input name="hs_code" /></label><label>Unit value USD<input required min="0" step="0.01" name="unit_value" type="number" /></label><label>Length cm<input required min="0.1" step="0.1" name="length_cm" type="number" /></label><label>Width cm<input required min="0.1" step="0.1" name="width_cm" type="number" /></label><label>Height cm<input required min="0.1" step="0.1" name="height_cm" type="number" /></label><label>Unit weight kg<input required min="0.01" step="0.01" name="weight_kg" type="number" /></label><label className="check"><input name="stackable" type="checkbox" defaultChecked /> Stackable</label><label className="check"><input name="fragile" type="checkbox" /> Fragile</label><div className="formAction"><button disabled={busy}>{busy ? "Recording…" : "Record order"}</button><small>Booking and customs filing remain human-controlled.</small></div>
         </form>{receipt ? <div className="receipt"><strong>{receipt.tracking_number}</strong><span>Order accepted · {receipt.state.replaceAll("_", " ")}</span></div> : null}</section>
         <section className="panel workbench" id="consolidation"><div className="panelHeader"><div><p className="eyebrow">Database-backed consolidation</p><h2>Open package pool</h2><p className="muted">Recomputed from every unallocated package. Proposal only—warehouse staff confirm actual placement.</p></div></div>{dashboard?.livePlan ? <><div className="planGrid"><div className="modeCard"><span className="status">PROPOSED</span><strong>{dashboard.livePlan.freightMode.replaceAll("_", " ")}</strong><span>{dashboard.livePlan.pallets.length} pallets · {dashboard.livePlan.packageCount} pieces</span></div><div className="priceCard"><span>Estimated freight</span><strong>${dashboard.livePlan.estimatedFreight.amount.toLocaleString()}</strong><small>{dashboard.livePlan.estimatedFreight.rateCardVersion}</small></div><div className="utilCard"><span>Chargeable volume</span><strong>{dashboard.livePlan.chargeableCbm} CBM</strong><small>{dashboard.livePlan.totalWeightKg.toLocaleString()} kg</small></div></div><div className="reasonStrip"><span>Planner decision</span><p>{dashboard.livePlan.reasons.join(" ")}</p></div><p className="planId">{dashboard.livePlan.planId} · {dashboard.livePlan.effectAuthority}</p></> : <p className="emptyState">No packages are waiting for palletization. Create an order to open the planning pool.</p>}</section>
-        <section className="panel" id="orders"><div className="panelHeader"><div><p className="eyebrow">FedEx-style event history</p><h2>Active order pipeline</h2></div></div><div className="orderTable">{snapshot?.recent_orders.map(order => <article key={order.id}><div><strong>{order.tracking_number}</strong><span>{order.source}{order.source_order_id ? ` · ${order.source_order_id}` : ""} · {order.destination_city ?? "USA"}</span></div><span className="pill neutral">{order.state.replaceAll("_", " ")}</span><select aria-label={`Advance ${order.tracking_number}`} defaultValue="" onChange={event => { if (event.target.value) void advance(order.id, event.target.value); }} disabled={busy}><option value="">Next status…</option>{(transitions[order.state] ?? []).map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select></article>)}{!snapshot?.recent_orders.length ? <p className="emptyState">No orders yet.</p> : null}</div></section>
+        {sultan ? <section className="panel sultanPanel"><div><p className="eyebrow">Sultan FEP · advisory only</p><h2>{sultan.recommended_provider_code?.replaceAll("_", " ") ?? "Manual review required"}</h2><p className="muted">{sultan.provider_reason}</p></div><div><span className={`pill ${sultan.customs_ready ? "good" : "warn"}`}>{sultan.customs_ready ? "Customs gates ready" : `${sultan.missing_information.length} gates open`}</span><strong>{sultan.pallet_estimate.pallet_count} pallets · {sultan.pallet_estimate.freight_mode.replaceAll("_", " ")}</strong><p>{sultan.next_human_action}</p><small>All execution permissions: {Object.values(sultan.authority).some(Boolean) ? "review required" : "false"}</small></div></section> : null}
+        <section className="panel" id="orders"><div className="panelHeader"><div><p className="eyebrow">FedEx-style event history</p><h2>Active order pipeline</h2></div></div><div className="orderTable">{snapshot?.recent_orders.map(order => <article key={order.id}><div><strong>{order.tracking_number}</strong><span>{order.source}{order.source_order_id ? ` · ${order.source_order_id}` : ""} · {order.destination_city ?? "USA"}</span></div><span className="pill neutral">{order.state.replaceAll("_", " ")}</span><select aria-label={`Advance ${order.tracking_number}`} defaultValue="" onChange={event => { if (event.target.value) void advance(order.id, event.target.value); }} disabled={busy}><option value="">Next status…</option>{(transitions[order.state] ?? []).map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select><button className="secondary" onClick={() => void recommend(order.id)} disabled={busy}>Ask Sultan</button></article>)}{!snapshot?.recent_orders.length ? <p className="emptyState">No orders yet.</p> : null}</div></section>
         <TrackingPanel onTrack={track} tracking={tracking} />
       </div></div>
   </main>;

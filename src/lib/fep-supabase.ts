@@ -27,12 +27,15 @@ export async function fepRequest<T>(path: string, init: RequestInit = {}, access
 
 export async function fepServiceRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!FEP_SUPABASE_SECRET_KEY) throw new Error("FEP_SUPABASE_SECRET_KEY is not configured");
+  const serviceAuthorization = FEP_SUPABASE_SECRET_KEY.startsWith("sb_secret_")
+    ? {}
+    : { authorization: `Bearer ${FEP_SUPABASE_SECRET_KEY}` };
   const response = await fetch(`${FEP_SUPABASE_URL}${path}`, {
     ...init,
     cache: "no-store",
     headers: {
       apikey: FEP_SUPABASE_SECRET_KEY,
-      authorization: `Bearer ${FEP_SUPABASE_SECRET_KEY}`,
+      ...serviceAuthorization,
       "content-type": "application/json",
       ...init.headers,
     },

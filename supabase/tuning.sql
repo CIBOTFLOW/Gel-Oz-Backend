@@ -22,6 +22,7 @@ create index go_handoffs_shipment_idx on public.go_provider_handoffs(shipment_id
 create index go_work_orders_order_idx on public.go_work_orders(order_id,state) where order_id is not null;
 create index go_work_orders_package_idx on public.go_work_orders(package_id) where package_id is not null;
 create index go_work_orders_assigned_idx on public.go_work_orders(assigned_to,state) where assigned_to is not null;
+create index go_work_orders_facility_idx on public.go_work_orders(facility_id) where facility_id is not null;
 create index go_inquiries_tenant_idx on public.go_customer_inquiries(tenant_id,state,created_at desc);
 create index go_inquiries_order_idx on public.go_customer_inquiries(order_id,created_at desc) where order_id is not null;
 create index go_inquiries_assigned_idx on public.go_customer_inquiries(assigned_to,state) where assigned_to is not null;

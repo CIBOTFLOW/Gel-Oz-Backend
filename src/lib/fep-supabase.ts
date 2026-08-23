@@ -77,6 +77,9 @@ export const fepAuth = {
   user(accessToken: string) {
     return fepRequest<{ id: string; email?: string }>("/auth/v1/user", { method: "GET" }, accessToken);
   },
+  updatePassword(accessToken: string, password: string) {
+    return fepRequest<{ id: string; email?: string }>("/auth/v1/user", { method: "PUT", body: JSON.stringify({ password }) }, accessToken);
+  },
 };
 
 export interface AuthSession {

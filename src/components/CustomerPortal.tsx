@@ -33,6 +33,7 @@ export default function CustomerPortal() {
   const [message, setMessage] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [recovery, setRecovery] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -44,7 +45,7 @@ export default function CustomerPortal() {
     }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { setRecovery(window.location.hash === "#parola-yenile"); void load(); }, [load]);
 
   async function authenticate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setMessage(""); setNotice("");
@@ -75,6 +76,7 @@ export default function CustomerPortal() {
     <header className="customerTop"><a className="publicBrand" href="/"><span>GÖ</span><div><strong>Gel Öz</strong><small>Müşteri merkezi</small></div></a><nav><a href="#overview">Özet</a><a href="#orders">Gönderiler</a><a href="#quotes">Teklifler</a><a href="#documents">Belgeler</a><a href="#support">Destek</a></nav><div className="customerIdentity"><span>{dashboard.profile.email}</span><button className="secondary" onClick={async()=>{ await fetch("/api/v1/auth/session",{method:"DELETE"}); setStatus("signed-out"); setDashboard(null); }}>Çıkış</button></div></header>
     <div className="customerShell"><aside className="customerSide"><p className="asideLabel">Hesabım</p><a className="selected" href="#overview">Genel bakış</a><a href="#orders">Gönderiler <span>{dashboard.summary.active_orders}</span></a><a href="#quotes">Teklifler <span>{dashboard.summary.open_quotes}</span></a><a href="#documents">Belgeler <span className={dashboard.summary.documents_needed ? "danger" : ""}>{dashboard.summary.documents_needed}</span></a><a href="#support">Destek <span>{dashboard.summary.open_inquiries}</span></a><div className="customerPromise"><small>Gel Öz görünürlük sözü</small><strong>Her teslimat için tek kayıt.</strong><p>Tedarikçi kapısından son adrese kadar doğrulanmış kilometre taşları.</p></div></aside>
       <div className="customerContent" id="overview"><section className="customerWelcome"><div><p className="eyebrow">Müşteri kontrol merkezi</p><h1>Merhaba, {dashboard.profile.full_name || dashboard.profile.company_name || dashboard.profile.email.split("@")[0]}.</h1><p>Aktif işlerinizi, bekleyen belgelerinizi ve Gel Öz ekibiyle görüşmelerinizi burada yönetin.</p></div><a className="primaryLink" href="/#calculator">Yeni teklif al →</a></section>
+        {recovery ? <RecoveryPanel onSaved={()=>{setRecovery(false);setNotice("Parolanız güncellendi. Yeni parolanızla giriş yapabilirsiniz.");history.replaceState(null,"","/musteri");}} onError={setMessage}/> : null}
         {notice ? <div className="customerNotice">{notice}</div> : null}{message ? <div className="publicAlert">{message}</div> : null}
         <section className="customerSignals">{[["Aktif gönderi",dashboard.summary.active_orders,"Uçtan uca takip"],["Açık teklif",dashboard.summary.open_quotes,"Rota karşılaştırması"],["Gereken belge",dashboard.summary.documents_needed,"Gümrük hazırlığı"],["Açık destek",dashboard.summary.open_inquiries,"Gel Öz ekibi"]].map(([title,value,hint])=><article key={String(title)}><span>{title}</span><strong>{value}</strong><small>{hint}</small></article>)}</section>
 
@@ -92,6 +94,12 @@ export default function CustomerPortal() {
 }
 
 function Empty({title,copy,action,href}:{title:string;copy:string;action?:string;href?:string}) { return <div className="customerEmpty"><span>GÖ</span><h3>{title}</h3><p>{copy}</p>{action&&href?<a href={href}>{action} →</a>:null}</div>; }
+
+function RecoveryPanel({onSaved,onError}:{onSaved:()=>void;onError:(message:string)=>void}) {
+  const [busy,setBusy]=useState(false);
+  async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();setBusy(true);onError("");const form=new FormData(event.currentTarget);const password=String(form.get("password")??"");const confirm=String(form.get("confirm")??"");if(password!==confirm){onError("Parolalar eşleşmiyor.");setBusy(false);return;}try{await jsonFetch("/api/v1/auth/password",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password})});onSaved();}catch(error){onError(error instanceof Error?error.message:"Parola güncellenemedi.");}finally{setBusy(false)}}
+  return <section className="customerPanel recoveryPanel"><div><p className="eyebrow">Güvenli hesap işlemi</p><h2>Yeni parolanızı belirleyin</h2><p>En az 8 karakter kullanın. Bu işlem mevcut kurtarma oturumunuz doğrulandıktan sonra yapılır.</p></div><form onSubmit={submit}><label>Yeni parola<input required minLength={8} maxLength={128} name="password" type="password" autoComplete="new-password"/></label><label>Yeni parola tekrar<input required minLength={8} maxLength={128} name="confirm" type="password" autoComplete="new-password"/></label><button disabled={busy}>{busy?"Güncelleniyor…":"Parolayı güncelle"}</button></form></section>;
+}
 
 function SupportPanel({orders,inquiries,onCreated,onError}:{orders:Order[];inquiries:Inquiry[];onCreated:()=>Promise<void>;onError:(message:string)=>void}) {
   const [busy,setBusy]=useState(false);

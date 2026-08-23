@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { fepServiceRequest } from "@/lib/fep-supabase";
 
 const INTAKE_SECRET = process.env.GEL_OZ_INTAKE_WEBHOOK_SECRET;
-const DEFAULT_TENANT_ID = process.env.GEL_OZ_DEFAULT_TENANT_ID;
+const DEFAULT_TENANT_ID = process.env.GEL_OZ_DEFAULT_TENANT_ID ?? "0dacaac2-2f26-436d-af15-7dfd9fd3706d";
 const allowedSources = new Set(["LUZIONE", "SHOPIFY", "FEP", "API", "OTHER"]);
 
 function validSignature(rawBody: string, timestamp: string, supplied: string) {

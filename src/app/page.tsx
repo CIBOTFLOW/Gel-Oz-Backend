@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+import QuotePortal from "@/components/QuotePortal";
 
 export default function Home() {
-  redirect("/operations");
+  return <QuotePortal />;
 }
-

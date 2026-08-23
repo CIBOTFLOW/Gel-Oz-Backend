@@ -25,17 +25,19 @@ async function waitUntilReady() {
 
 try {
   await waitUntilReady();
-  const [health, operations] = await Promise.all([
+  const [health, customer, operations] = await Promise.all([
     fetch(`${origin}/api/health`),
+    fetch(`${origin}/`),
     fetch(`${origin}/operations`),
   ]);
   assert.equal(health.status, 200);
   assert.equal((await health.json()).status, "ok");
+  assert.equal(customer.status, 200);
+  assert.match(await customer.text(), /Compare routes before requesting a firm quote/);
   assert.equal(operations.status, 200);
   const html = await operations.text();
-  assert.match(html, /Operations control tower/);
-  assert.match(html, /Consolidation planner/);
-  console.log("Runtime verification passed: health, operations page, and key operator content are reachable.");
+  assert.match(html, /Opening the Gel Öz control tower/);
+  console.log("Runtime verification passed: health, customer quote portal, and operations shell are reachable.");
 } finally {
   server.kill("SIGTERM");
 }

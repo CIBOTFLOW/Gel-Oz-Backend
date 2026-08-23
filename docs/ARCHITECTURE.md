@@ -34,13 +34,22 @@ Do not reuse Luzione CRM, proposal, product-margin, designer, or marketing objec
 
 ## Backend modules
 
-1. Intake: customer order and package facts, incoterms, origin, destination, service requirements.
-2. Receiving: ASN, dock appointment, inspection, discrepancy, quarantine, and put-away.
-3. Warehouse: locations, inventory custody, repack/kitting, work orders, shifts, safety and productivity signals.
-4. Consolidation: compatibility constraints, palletization, LCL/FCL comparison, container placement, cutoffs, and plan approval.
-5. Shipment: legs, bookings, customs documents, milestones, exceptions, and costs.
-6. Delivery: parcel/LTL/white-glove routing, provider labels/bookings, appointments, proof of delivery, and claims.
-7. Intelligence: operational signals and Sultan recommendations kept separate from evidence and authority.
+1. Quote: customer cargo facts, EXW lane estimates, supplier-rate requests, transparent Gel Öz fee, firm versions, and win/loss/variance evidence.
+2. Intake: accepted quote/customer order and package facts, incoterms, origin, destination, service requirements.
+3. Receiving: ASN, dock appointment, inspection, discrepancy, quarantine, and put-away.
+4. Warehouse: locations, inventory custody, repack/kitting, work orders, shifts, safety and productivity signals.
+5. Consolidation: compatibility constraints, palletization, LCL/FCL comparison, container placement, cutoffs, and plan approval.
+6. Shipment: legs, bookings, customs documents, milestones, exceptions, and costs.
+7. Delivery: parcel/LTL/white-glove routing, provider labels/bookings, appointments, proof of delivery, and claims.
+8. Intelligence: forecast-versus-actual quote and fulfillment evidence plus Sultan recommendations, kept separate from authority.
+
+## Provider boundary
+
+- Easyship: live parcel/final-mile rate, shipment, label, and tracking adapter after API activation.
+- RXO: U.S. LTL/FTL/white-glove pricing and booking after partner API/EDI onboarding; portal/manual remains the fallback.
+- Flexport: booking, shipment, customs-entry, commercial-invoice, and document connectivity. Quote pricing remains a portal/account workflow, so Gel Öz stores it as a supplier quote rather than fabricating an API response.
+- Vanguard/Matraş/other forwarders: normalized manual/email/portal supplier quotes until a contracted interface is available.
+- Licensed customs broker: importer-of-record, POA, bond, entry, classification, duty, exam, and release evidence. The calculator only includes a broker allowance; it never represents duty as final without HS-code and importer review.
 
 ## Manual-first integration pattern
 
@@ -56,4 +65,3 @@ Growth, Sales, Marketing, and Finance should subscribe to logistics events inste
 - Growth reads receiving volume, repeat shipper activity, fill-rate opportunity, and service-region demand.
 - Marketing reads only consented customer/segment projections.
 - Finance reads rated costs, approvals, invoices, accruals, and variances; it never reconstructs shipment truth from invoices.
-

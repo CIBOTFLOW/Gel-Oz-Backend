@@ -1,10 +1,13 @@
-# Gel Öz Operations
+# Gel Öz Logistics Platform
 
-Gel Öz Operations is the logistics backend and operator surface for consolidating Turkey and Italy orders, planning warehouse handling, comparing LCL/FCL options, and routing US last-mile delivery.
+Gel Öz is a two-sided logistics platform for EXW shipments from Türkiye and Italy to the United States. `/` is the customer quote and tracking portal; `/operations` is the authenticated quote, order, warehouse, consolidation, handoff, and exception control tower.
 
 The production-shaped operations slice deliberately separates logistics truth from both Luzione UI and Sultan OS. It includes:
 
 - a deterministic consolidation and freight estimate engine;
+- a public quote calculator that compares five U.S. arrival ports, ocean LCL/FCL, and air alternatives;
+- a transparent tiered coordination margin (18% small-load to 9% FCL/high-volume, with a minimum fee);
+- a persisted quote inbox, route options, supplier-rate requests, firm-offer versions, and quote-event history;
 - pallet and container utilization estimates;
 - Easyship, Shopify Shipping, and RXO routing recommendations;
 - authenticated operator accounts and tenant-scoped workspaces;
@@ -24,7 +27,7 @@ npm run typecheck
 npm run dev
 ```
 
-Open `http://localhost:3000/operations`.
+Open `http://localhost:3000` for the customer portal or `http://localhost:3000/operations` for staff.
 
 ## Database setup
 
@@ -32,7 +35,7 @@ The migration sequence in `supabase/` is already applied to FEP and remains sour
 
 ## Current evidence level
 
-The operator UI and API use the FEP Supabase database for real order, package, document, work, status-event, and tracking records. The calculator rebuilds its proposal from unallocated database packages. Live Easyship, Shopify, RXO, Vanguard, Matras, customs-broker, and warehouse-device effects remain intentionally disconnected until credentials, contracts, sandbox replay, webhook verification, authorization, and provider readback are complete. Each unsupported effect keeps a manual operator path.
+The customer portal saves real quote requests and calculator snapshots in FEP Supabase; the operator UI uses the same database for quote, order, package, document, work, status-event, and tracking records. The calculator is an internal standard rate card, not a live carrier tariff. Live Easyship, Shopify, RXO, Vanguard, Matraş, Flexport, customs-broker, and warehouse-device effects remain intentionally disconnected until credentials, contracts, sandbox replay, webhook verification, authorization, and provider readback are complete. Each unsupported effect keeps a manual operator path.
 
 ## Integration rule
 

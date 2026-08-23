@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Gel Öz Operations",
-  description: "Cross-border consolidation and delivery operations",
+  title: "Gel Öz | Türkiye & Italy to USA logistics",
+  description: "EXW freight estimates, supplier-backed quotes, consolidation, customs coordination, delivery, and tracking.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -13,4 +13,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
-

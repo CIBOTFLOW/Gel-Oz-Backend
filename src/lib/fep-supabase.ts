@@ -1,5 +1,6 @@
 const FEP_SUPABASE_URL = process.env.NEXT_PUBLIC_FEP_SUPABASE_URL ?? "https://lbsskynkwlfdexwncoud.supabase.co";
 const FEP_SUPABASE_KEY = process.env.NEXT_PUBLIC_FEP_SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_w34Dz8WJ36Se8u01vcNgfw_o08kfoBe";
+const FEP_SUPABASE_SECRET_KEY = process.env.FEP_SUPABASE_SECRET_KEY;
 
 export class SupabaseApiError extends Error {
   constructor(public status: number, public payload: unknown) {
@@ -15,6 +16,24 @@ export async function fepRequest<T>(path: string, init: RequestInit = {}, access
       apikey: FEP_SUPABASE_KEY,
       "content-type": "application/json",
       ...(accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
+      ...init.headers,
+    },
+  });
+  const text = await response.text();
+  const payload = text ? JSON.parse(text) : null;
+  if (!response.ok) throw new SupabaseApiError(response.status, payload);
+  return payload as T;
+}
+
+export async function fepServiceRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (!FEP_SUPABASE_SECRET_KEY) throw new Error("FEP_SUPABASE_SECRET_KEY is not configured");
+  const response = await fetch(`${FEP_SUPABASE_URL}${path}`, {
+    ...init,
+    cache: "no-store",
+    headers: {
+      apikey: FEP_SUPABASE_SECRET_KEY,
+      authorization: `Bearer ${FEP_SUPABASE_SECRET_KEY}`,
+      "content-type": "application/json",
       ...init.headers,
     },
   });

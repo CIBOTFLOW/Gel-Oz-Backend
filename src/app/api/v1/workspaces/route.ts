@@ -19,7 +19,7 @@ export async function POST() {
   try {
     const workspace = await fepRequest("/rest/v1/rpc/go_bootstrap_workspace", {
       method: "POST",
-      body: JSON.stringify({ p_name: "Gel Öz Logistics", p_slug: "gel-oz" }),
+      body: JSON.stringify({ p_name: "Gel Öz Logistics", p_slug: "gel-oz-logistics" }),
     }, token);
     return NextResponse.json({ workspace }, { status: 201 });
   } catch (error) {

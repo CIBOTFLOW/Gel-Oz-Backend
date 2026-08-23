@@ -167,6 +167,51 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
 .quoteInboxRows span,.quoteInboxRows small,.quoteInboxRows time { color: var(--muted); font-size: 9px; }
 .quotePrice strong { font-family: Georgia,serif; font-size: 22px; font-weight: 500; }
 .quoteDescription p { max-width: 260px; margin: 0; font-size: 10px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.quoteDescription button { margin-top: 3px; padding: 7px 9px; color: var(--green); border-color: #bad0ca; font-size: 9px; }
+.quoteInboxEntry { border-bottom: 1px solid var(--line); }
+.quoteInboxEntry:last-child { border-bottom: 0; }
+.quoteInboxEntry > article { display: grid; grid-template-columns: 1.15fr .8fr .8fr 1fr; gap: 18px; align-items: center; min-height: 105px; padding: 14px 0; }
+.quoteInboxEntry > article > div { min-width: 0; display: grid; justify-items: start; gap: 5px; }
+.quoteWorkbench { margin: 0 -20px; background: #f7faf8; border-top: 1px solid var(--line); }
+.quoteWorkbenchHead { display: flex; justify-content: space-between; gap: 24px; padding: 20px 22px; background: linear-gradient(110deg,#f1f7f4,#fff); border-bottom: 1px solid var(--line); }
+.quoteWorkbenchHead h3,.quoteWorkbench h4 { margin: 0; font-family: Georgia,serif; font-weight: 500; }
+.quoteWorkbenchHead h3 { font-size: 18px; }
+.quoteWorkbenchHead p:not(.eyebrow) { margin: 6px 0 0; color: var(--muted); font-size: 10px; }
+.offerBadge { min-width: 190px; display: grid; justify-items: end; align-content: center; gap: 3px; }
+.offerBadge span,.offerBadge small { color: var(--muted); font-size: 9px; }
+.offerBadge strong { font-family: Georgia,serif; font-size: 23px; font-weight: 500; }
+.workbenchNotice { margin: 14px 22px 0; padding: 10px 12px; color: var(--green); background: var(--green-soft); border-radius: 7px; font-size: 10px; }
+.quoteWorkbenchGrid { display: grid; grid-template-columns: 1.1fr .9fr; }
+.quoteWorkbenchGrid > section { min-width: 0; padding: 20px 22px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.quoteWorkbenchGrid > section:nth-child(2) { border-right: 0; }
+.quoteWorkbench h4 { margin-bottom: 14px; font-size: 15px; }
+.rateForm { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.rateForm .wide { grid-column: span 2; }
+.rateForm button { align-self: end; min-height: 39px; }
+.rateLedger { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: white; }
+.rateLine { grid-template-columns: 18px 1fr auto; align-items: center; gap: 8px; min-height: 51px; padding: 8px 10px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.rateLine:last-child { border-bottom: 0; }
+.rateLine input { width: 15px; height: 15px; }
+.rateLine > span { display: grid; gap: 3px; }
+.rateLine b { color: var(--ink); font-size: 9px; }
+.rateLine small { color: var(--muted); font-size: 8px; }
+.rateLine > strong { color: var(--green); font-size: 10px; }
+.coverageStrip { display: grid; gap: 4px; margin-top: 10px; }
+.coverageStrip span { font-size: 9px; font-weight: 800; }
+.coverageStrip .missing { color: var(--red); }
+.coverageStrip .complete { color: var(--green); }
+.coverageStrip small { color: var(--muted); font-size: 8px; }
+.offerComposer { grid-column: 1/-1; display: grid; grid-template-columns: .75fr .9fr 1.35fr; gap: 20px; align-items: start; border-right: 0 !important; }
+.offerComposer h4 { margin-top: 2px; }
+.offerMath { display: grid; gap: 7px; }
+.offerMath > div { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 7px; border-bottom: 1px solid var(--line); }
+.offerMath span { color: var(--muted); font-size: 9px; }
+.offerMath strong { font-size: 10px; }
+.offerMath .offerTotal strong { color: var(--green); font-family: Georgia,serif; font-size: 18px; font-weight: 500; }
+.offerForm { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.offerForm .wide,.offerForm > small { grid-column: 1/-1; }
+.offerForm button { justify-self: start; }
+.offerForm > small { color: var(--muted); font-size: 8px; }
 .executionPanel { margin-top: 16px; overflow: hidden; }
 .executionError { padding: 0 22px; }
 .executionGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
@@ -197,7 +242,10 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
   .executionGrid { grid-template-columns: 1fr; }
   .executionGrid > section { border-right: 0; }
   .inquiryForm { grid-template-columns: 1fr 1fr; }
-  .quoteInboxRows > article { grid-template-columns: 1fr 1fr; }
+  .quoteInboxRows > article,.quoteInboxEntry > article { grid-template-columns: 1fr 1fr; }
+  .quoteWorkbenchGrid { grid-template-columns:1fr; }
+  .quoteWorkbenchGrid > section { border-right:0; }
+  .offerComposer { grid-template-columns:1fr; }
 }
 
 @media (max-width: 620px) {
@@ -216,9 +264,13 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
   .intakeForm { grid-template-columns: 1fr; }
   .intakeForm .wide { grid-column: auto; }
   .orderTable article { grid-template-columns: 1fr; padding: 14px 0; }
-  .quoteInboxRows > article { grid-template-columns: 1fr; }
+  .quoteInboxRows > article,.quoteInboxEntry > article { grid-template-columns: 1fr; }
   .inlineOpsForm, .inquiryForm { grid-template-columns: 1fr; }
   .formAction { align-items: flex-start; flex-direction: column; }
+  .quoteWorkbenchHead { flex-direction:column; }
+  .offerBadge { justify-items:start; }
+  .rateForm,.offerForm,.acceptOfferForm { grid-template-columns:1fr; }
+  .rateForm .wide,.offerForm .wide,.acceptOfferForm .wide,.acceptConfirm { grid-column:auto; }
 }
 
 /* Customer quote and tracking portal */
@@ -452,6 +504,27 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
 .customerQuoteList article > div:first-child > strong { margin-right:10px; color:var(--green); font-family:ui-monospace,monospace; font-size:11px; }
 .customerQuoteList p { margin:10px 0 6px; font-size:11px; }
 .customerQuoteList small,.quoteBest span { color:#758481; font-size:9px; }
+.customerQuoteList > article.firmOfferReady { align-items:start; padding:24px 0; }
+.offerAcceptance { margin:16px 0 0; padding:12px 0 0; border-top:1px solid var(--line); }
+.offerAcceptance summary { color:var(--green); font-size:10px; }
+.offerBreakdown { display:grid; gap:8px; margin-top:14px; padding:14px; background:#f5f8f6; border-radius:8px; }
+.offerBreakdown > div { display:flex; justify-content:space-between; gap:16px; }
+.offerBreakdown span { color:var(--muted); font-size:9px; }
+.offerBreakdown strong { font-size:10px; }
+.offerBreakdown > div:last-child { padding-top:8px; border-top:1px solid var(--line); }
+.offerBreakdown > div:last-child strong { color:var(--green); font-family:Georgia,serif; font-size:18px; font-weight:500; }
+.offerScope { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+.offerScope span { padding:5px 7px; color:#48625f; background:var(--green-soft); border-radius:12px; font-size:8px; }
+.offerTerms { color:var(--muted); font-size:9px !important; line-height:1.55; }
+.acceptOfferForm { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+.acceptOfferForm .wide,.acceptOfferForm button,.acceptOfferForm > small { grid-column:1/-1; }
+.acceptConfirm { grid-column:1/-1; grid-template-columns:16px 1fr; align-items:start; }
+.acceptConfirm input { width:15px; height:15px; }
+.acceptConfirm span { color:var(--ink); font-size:9px; line-height:1.45; }
+.acceptOfferForm button { justify-self:start; }
+.acceptedOffer { display:flex; gap:10px; align-items:center; margin-top:14px; padding:10px; background:var(--green-soft); border-radius:7px; }
+.acceptedOffer b { color:var(--green); font-size:9px; }
+.acceptedOffer span { color:var(--muted); font-size:9px; }
 .quoteBest { display:grid; justify-items:end; gap:5px; }
 .quoteBest strong { font-family:Georgia,serif; font-size:27px; font-weight:500; }
 .documentGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:20px 22px; }

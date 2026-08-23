@@ -17,7 +17,7 @@ export default function AuthCallbackPage() {
     }).then(async response => {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Doğrulama tamamlanamadı.");
-      window.location.replace("/musteri");
+      window.location.replace(hash.get("type") === "recovery" ? "/musteri#parola-yenile" : "/musteri");
     }).catch(cause => setMessage(cause instanceof Error ? cause.message : "Doğrulama tamamlanamadı."));
   }, []);
 

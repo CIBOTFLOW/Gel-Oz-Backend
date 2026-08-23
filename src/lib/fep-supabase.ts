@@ -4,7 +4,13 @@ const FEP_SUPABASE_SECRET_KEY = process.env.FEP_SUPABASE_SECRET_KEY;
 
 export class SupabaseApiError extends Error {
   constructor(public status: number, public payload: unknown) {
-    super(typeof payload === "object" && payload && "message" in payload ? String(payload.message) : `FEP database request failed (${status})`);
+    const record = typeof payload === "object" && payload ? payload as Record<string, unknown> : {};
+    super(String(record.message ?? record.msg ?? record.error_description ?? record.error ?? `FEP database request failed (${status})`));
+  }
+
+  get code() {
+    const record = typeof this.payload === "object" && this.payload ? this.payload as Record<string, unknown> : {};
+    return String(record.error_code ?? record.code ?? "");
   }
 }
 
@@ -53,11 +59,23 @@ export const fepAuth = {
       body: JSON.stringify({ email, password }),
     });
   },
-  signUp(email: string, password: string) {
-    return fepRequest<AuthSession>("/auth/v1/signup", {
+  signUp(email: string, password: string, redirectTo?: string) {
+    const query = redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : "";
+    return fepRequest<AuthSession>(`/auth/v1/signup${query}`, {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
+  },
+  resendConfirmation(email: string, redirectTo?: string) {
+    const query = redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : "";
+    return fepRequest(`/auth/v1/resend${query}`, { method: "POST", body: JSON.stringify({ type: "signup", email }) });
+  },
+  recoverPassword(email: string, redirectTo?: string) {
+    const query = redirectTo ? `?redirect_to=${encodeURIComponent(redirectTo)}` : "";
+    return fepRequest(`/auth/v1/recover${query}`, { method: "POST", body: JSON.stringify({ email }) });
+  },
+  user(accessToken: string) {
+    return fepRequest<{ id: string; email?: string }>("/auth/v1/user", { method: "GET" }, accessToken);
   },
 };
 

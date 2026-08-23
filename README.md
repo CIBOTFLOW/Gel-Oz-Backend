@@ -1,6 +1,6 @@
 # Gel Öz Logistics Platform
 
-Gel Öz is a two-sided logistics platform for EXW shipments from Türkiye and Italy to the United States. `/` is the customer quote and tracking portal; `/operations` is the authenticated quote, order, warehouse, consolidation, handoff, and exception control tower.
+Gel Öz is a two-sided logistics platform for EXW shipments from Türkiye and Italy to the United States. `/` is the Turkish public site, quote calculator, and tracking entrypoint; `/musteri` is the authenticated customer account; `/operations` is the authenticated staff control tower.
 
 The production-shaped operations slice deliberately separates logistics truth from both Luzione UI and Sultan OS. It includes:
 
@@ -8,6 +8,7 @@ The production-shaped operations slice deliberately separates logistics truth fr
 - a public quote calculator that compares five U.S. arrival ports, ocean LCL/FCL, and air alternatives;
 - a transparent tiered coordination margin (18% small-load to 9% FCL/high-volume, with a minimum fee);
 - a persisted quote inbox, route options, supplier-rate requests, firm-offer versions, and quote-event history;
+- customer accounts that securely claim matching quotes/orders by verified email, then expose only customer-safe quotes, milestones, document states, preferences, and support inquiries;
 - pallet and container utilization estimates;
 - Easyship, Shopify Shipping, and RXO routing recommendations;
 - authenticated operator accounts and tenant-scoped workspaces;
@@ -27,7 +28,7 @@ npm run typecheck
 npm run dev
 ```
 
-Open `http://localhost:3000` for the customer portal or `http://localhost:3000/operations` for staff.
+Open `http://localhost:3000` for the public site, `http://localhost:3000/musteri` for customers, or `http://localhost:3000/operations` for staff.
 
 ## Database setup
 

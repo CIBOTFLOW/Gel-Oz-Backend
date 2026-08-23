@@ -74,6 +74,16 @@ export default function OperationsConsole() {
     finally { setBusy(false); }
   }
 
+  async function accountAction(action: "resend-confirmation" | "recover-password", form: HTMLFormElement) {
+    const email = String(new FormData(form).get("email") ?? "");
+    setBusy(true); setMessage("");
+    try {
+      const result = await jsonFetch<{ message: string }>("/api/v1/auth/action", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, email }) });
+      setMessage(result.message);
+    } catch (error) { setMessage(error instanceof Error ? error.message : "Account action failed"); }
+    finally { setBusy(false); }
+  }
+
   async function bootstrap() {
     setBusy(true); setMessage("");
     try { await jsonFetch("/api/v1/workspaces", { method: "POST" }); await load(); }
@@ -132,7 +142,7 @@ export default function OperationsConsole() {
   ] : [], [dashboard]);
 
   if (status === "loading") return <main className="centerCard"><p>Opening the Gel Öz control tower…</p></main>;
-  if (status === "signed-out") return <main className="authLayout"><section className="authCard"><p className="eyebrow">FEP-secured operations</p><h1>Operator access</h1><p className="muted">Sign in or create the first operator account. Customer tracking remains public; order and warehouse data does not.</p><form onSubmit={authenticate} className="stackForm"><label>Email<input required name="email" type="email" /></label><label>Password<input required minLength={8} name="password" type="password" /></label><div className="buttonRow"><button name="mode" value="sign-in" disabled={busy}>Sign in</button><button className="secondary" name="mode" value="sign-up" disabled={busy}>Create account</button></div></form>{message ? <p className="errorText">{message}</p> : null}<TrackingPanel onTrack={track} tracking={tracking} /></section></main>;
+  if (status === "signed-out") return <main className="authLayout"><section className="authCard"><p className="eyebrow">FEP-secured operations</p><h1>Operator access</h1><p className="muted">Sign in or create the first operator account. Customer tracking remains public; order and warehouse data does not.</p><form onSubmit={authenticate} className="stackForm"><label>Email<input required name="email" type="email" defaultValue="hello@ciflow.io" /></label><label>Password<input required minLength={8} name="password" type="password" /></label><div className="buttonRow"><button name="mode" value="sign-in" disabled={busy}>Sign in</button><button className="secondary" name="mode" value="sign-up" disabled={busy}>Create account</button></div><div className="authHelp"><button type="button" onClick={event => void accountAction("resend-confirmation", event.currentTarget.form!)} disabled={busy}>Resend confirmation</button><button type="button" onClick={event => void accountAction("recover-password", event.currentTarget.form!)} disabled={busy}>Reset password</button></div></form>{message ? <p className="errorText">{message}</p> : null}<TrackingPanel onTrack={track} tracking={tracking} /></section></main>;
   if (status === "needs-workspace") return <main className="centerCard"><section className="authCard"><p className="eyebrow">One-time setup</p><h1>Initialize Gel Öz Logistics</h1><p className="muted">Creates the Türkiye, Italy, and USA operating workspace and makes this account the owner.</p><button onClick={bootstrap} disabled={busy}>{busy ? "Initializing…" : "Initialize operations"}</button>{message ? <p className="errorText">{message}</p> : null}</section></main>;
 
   const snapshot = dashboard?.snapshot;

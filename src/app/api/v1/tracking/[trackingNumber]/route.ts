@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
-import { fepRequest } from "@/lib/fep-supabase";
+import { fepServiceRequest } from "@/lib/fep-supabase";
 
 export async function GET(_: Request, context: { params: Promise<{ trackingNumber: string }> }) {
   try {
     const { trackingNumber } = await context.params;
-    const data = await fepRequest("/rest/v1/rpc/go_public_tracking", { method: "POST", body: JSON.stringify({ p_tracking_number: trackingNumber }) });
+    const normalized = trackingNumber.trim().toUpperCase();
+    if (normalized.length < 6 || normalized.length > 64) {
+      return NextResponse.json({ error: "Tracking number not found" }, { status: 404 });
+    }
+    const data = await fepServiceRequest("/rest/v1/rpc/go_public_tracking", {
+      method: "POST",
+      body: JSON.stringify({ p_tracking_number: normalized }),
+    });
     if (!data) return NextResponse.json({ error: "Tracking number not found" }, { status: 404 });
     return NextResponse.json({ data });
   } catch (error) {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fepRequest } from "@/lib/fep-supabase";
+import { fepServiceRequest } from "@/lib/fep-supabase";
 import { estimateQuote, normalizeQuoteInput } from "@/modules/quotes/estimator";
 
 type QuoteReceipt = { quote_number: string; state: string; requested_at: string; duplicate: boolean };
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contactEmail) || contactEmail.length > 254) throw new Error("A valid contact email is required.");
     if (cargoDescription.length < 2 || cargoDescription.length > 500) throw new Error("Cargo description must be between 2 and 500 characters.");
     const idempotencyKey = request.headers.get("idempotency-key") ?? crypto.randomUUID();
-    const receipt = await fepRequest<QuoteReceipt>("/rest/v1/rpc/go_submit_quote_request", {
+    const receipt = await fepServiceRequest<QuoteReceipt>("/rest/v1/rpc/go_submit_quote_request", {
       method: "POST",
       body: JSON.stringify({
         p_idempotency_key: idempotencyKey,

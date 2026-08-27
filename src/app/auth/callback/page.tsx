@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LanguageSwitch, useLanguage } from "@/i18n/LanguageProvider";
 
 export default function AuthCallbackPage() {
-  const [message, setMessage] = useState("Hesabınız doğrulanıyor…");
+  const {text}=useLanguage();
+  const [message, setMessage] = useState(text("Hesabınız doğrulanıyor…","Verifying your account…"));
 
   useEffect(() => {
     const hash = new URLSearchParams(window.location.hash.slice(1));
@@ -21,5 +23,5 @@ export default function AuthCallbackPage() {
     }).catch(cause => setMessage(cause instanceof Error ? cause.message : "Doğrulama tamamlanamadı."));
   }, []);
 
-  return <main className="centerCard"><section className="authCard"><p className="eyebrow">Gel Öz müşteri hesabı</p><h1>{message}</h1><p className="muted">Bu sayfayı kapatmadan birkaç saniye bekleyin.</p></section></main>;
+  return <main className="centerCard"><section className="authCard"><LanguageSwitch/><p className="eyebrow">{text("Gel Öz müşteri hesabı","Gel Öz customer account")}</p><h1>{message}</h1><p className="muted">{text("Bu sayfayı kapatmadan birkaç saniye bekleyin.","Wait a few seconds without closing this page.")}</p></section></main>;
 }

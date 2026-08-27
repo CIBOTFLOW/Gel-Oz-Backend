@@ -126,6 +126,11 @@ details li { margin-bottom: 5px; }
 label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .03em; }
 input, select { min-width: 0; width: 100%; height: 39px; padding: 0 10px; color: var(--ink); background: white; border: 1px solid #cddad7; border-radius: 7px; outline: none; }
 input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(15,90,80,.1); }
+.languageSwitch { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid #b9c6c3; border-radius: 999px; background: rgba(255,255,255,.72); }
+.languageSwitch button { min-width: 35px; padding: 6px 9px; color: #526867; background: transparent; border: 0; border-radius: 999px; font-size: 9px; font-weight: 850; letter-spacing: .08em; }
+.languageSwitch button:hover { transform: none; box-shadow: none; }
+.languageSwitch button.active { color: white; background: var(--green); }
+.languageSwitch.compact button { min-width: 31px; padding: 5px 7px; }
 .buttonRow { display: flex; gap: 10px; align-items: center; }
 .buttonRow .secondary, .intakeForm .secondary { color: var(--ink); }
 .errorText { color: var(--red); font-size: 12px; }
@@ -384,9 +389,10 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
   .processGrid { grid-template-columns:repeat(2,1fr); }
 }
 @media (max-width: 700px) {
+  .publicNav { gap:10px; padding:0 14px; }
   .publicNav nav { display:none; }
-  .operatorLink { font-size:0; }
-  .operatorLink::after { content:"Staff"; font-size:10px; }
+  .operatorLink { padding:8px 10px; font-size:9px; white-space:nowrap; }
+  .operatorLink::after { content:none; }
   .quoteHero { padding:60px 22px; background:#f7f4ef; }
   .heroCopy h1 { font-size:48px; }
   .quoteCalculator { grid-template-columns:1fr; }
@@ -566,7 +572,6 @@ input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rg
 }
 
 @media (max-width:700px) {
-  .operatorLink::after { content:"Hesabım"; }
   .heroActions { flex-wrap:wrap; }
   .serviceStory,.homeFocus { padding:70px 22px; }
   .serviceGrid { grid-template-columns:1fr; }
